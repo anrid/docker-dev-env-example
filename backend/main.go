@@ -39,7 +39,7 @@ func main() {
 	Spanner Instance ID : %s
 	Spanner Database ID : %s
 	Use Spanner Emu     : %t (%s)
-	`
+	` + "\n"
 
 	spannerEmuHost, isUseEmu := os.LookupEnv("SPANNER_EMULATOR_HOST")
 	_, err = fmt.Printf(format, cfg.GCloudProject, cfg.SpannerInstanceID, cfg.SpannerDatabaseID, isUseEmu, spannerEmuHost)
@@ -50,6 +50,9 @@ func main() {
 	ctx := context.Background()
 
 	if isUseEmu {
+		log.Print("Deleting Spanner instance ...")
+		deleteInstance(ctx, cfg.GCloudProject, cfg.SpannerInstanceID)
+
 		log.Print("Creating Spanner instance ...")
 		if err := createInstance(ctx, cfg.GCloudProject, cfg.SpannerInstanceID); err != nil {
 			log.Fatal(err)
@@ -311,6 +314,28 @@ func insertOrUpdate(ctx context.Context, dbPath string) error {
 	_, err = client.Apply(ctx, m)
 
 	return err
+}
+
+func deleteInstance(ctx context.Context, projectID, instanceID string) error {
+	instanceAdmin, err := instance.NewInstanceAdminClient(ctx)
+	if err != nil {
+		return err
+	}
+	defer instanceAdmin.Close()
+
+	name := fmt.Sprintf("projects/%s/instances/%s", projectID, instanceID)
+
+	err = instanceAdmin.DeleteInstance(ctx, &instancepb.DeleteInstanceRequest{
+		Name: name,
+	})
+	if err != nil {
+		return fmt.Errorf("could not delete instance %s: %v", fmt.Sprintf("projects/%s/instances/%s", projectID, instanceID), err)
+	}
+
+	log.Printf("Deleted instance [%s]", name)
+
+	return nil
+
 }
 
 func createInstance(ctx context.Context, projectID, instanceID string) error {
