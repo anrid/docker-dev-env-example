@@ -14,6 +14,11 @@ RUN apt-get update && \
     apt-get install -y protobuf-compiler && \
     go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 && \
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+
+RUN git config --global user.name 'A D' && \
+    git config --global user.email 'x@y.com' && \
+    alias ll='ls -latr'
+
 CMD ["go", "run", "main.go"]
 
 FROM alpine:3.16
