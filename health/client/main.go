@@ -21,7 +21,7 @@ const (
 	streamingCount  = 10
 )
 
-func unaryCallWithMetadata(c pb.EchoClient, message string) {
+func unaryCallWithMetadata(c pb.HealthClient, message string) {
 	fmt.Printf("--- unary ---\n")
 	// Create metadata and context.
 	md := metadata.Pairs("timestamp", time.Now().Format(timestampFormat))
@@ -29,7 +29,7 @@ func unaryCallWithMetadata(c pb.EchoClient, message string) {
 
 	// Make RPC using the context with the metadata.
 	var header, trailer metadata.MD
-	r, err := c.UnaryEcho(ctx, &pb.EchoRequest{Message: message}, grpc.Header(&header), grpc.Trailer(&trailer))
+	r, err := c.Check(ctx, &pb.HealthCheckRequest{Service: "Let's Go!"}, grpc.Header(&header), grpc.Trailer(&trailer))
 	if err != nil {
 		log.Fatalf("failed to call UnaryEcho: %v", err)
 	}
@@ -42,6 +42,7 @@ func unaryCallWithMetadata(c pb.EchoClient, message string) {
 	} else {
 		log.Fatal("timestamp expected but doesn't exist in header")
 	}
+
 	if l, ok := header["location"]; ok {
 		fmt.Printf("location from header:\n")
 		for i, e := range l {
@@ -50,8 +51,9 @@ func unaryCallWithMetadata(c pb.EchoClient, message string) {
 	} else {
 		log.Fatal("location expected but doesn't exist in header")
 	}
+
 	fmt.Printf("response:\n")
-	fmt.Printf(" - %s\n", r.Message)
+	fmt.Printf(" - %s\n", r.Status)
 
 	if t, ok := trailer["timestamp"]; ok {
 		fmt.Printf("timestamp from trailer:\n")
