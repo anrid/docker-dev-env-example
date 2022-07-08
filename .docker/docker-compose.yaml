@@ -13,8 +13,14 @@ services:
       - 8080:8000
     depends_on:
       - db
+    volumes:
+      - vscode:/root/.vscode-server/extensions
+
   db:
     image: gcr.io/cloud-spanner-emulator/emulator:latest
     restart: always
     expose:
       - 9010
+
+volumes:
+  vscode:
