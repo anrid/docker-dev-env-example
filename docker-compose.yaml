@@ -1,6 +1,7 @@
 services:
   backend:
-    build: backend
+    build:
+      context: backend
     environment:
       - SPANNER_EMULATOR_HOST=db:9010
       - MYAPP_GCLOUD_PROJECT=coolio

@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "backend"
+		},
+		{
+			"path": "health"
+		},
+		{
+			"path": "proto"
+		},
+		{
+			"path": ".devcontainer"
+		}
+	],
+	"settings": {}
+}
